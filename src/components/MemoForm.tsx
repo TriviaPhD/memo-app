@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import MDEditor from '@uiw/react-md-editor'
 import {
   Memo,
   MemoFormData,
@@ -11,7 +12,7 @@ import {
 interface MemoFormProps {
   isOpen: boolean
   onClose: () => void
-  onSubmit: (data: MemoFormData) => void
+  onSubmit: (data: MemoFormData) => Promise<void>
   editingMemo?: Memo | null
 }
 
@@ -28,6 +29,7 @@ export default function MemoForm({
     tags: [],
   })
   const [tagInput, setTagInput] = useState('')
+  const [editorHeight, setEditorHeight] = useState(500)
 
   // 편집 모드일 때 폼 데이터 설정
   useEffect(() => {
@@ -49,14 +51,27 @@ export default function MemoForm({
     setTagInput('')
   }, [editingMemo, isOpen])
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // 에디터 높이 설정
+  useEffect(() => {
+    const updateEditorHeight = () => {
+      const height = window.innerHeight
+      setEditorHeight(height < 800 ? 350 : height < 1000 ? 450 : 500)
+    }
+
+    if (typeof window !== 'undefined') {
+      updateEditorHeight()
+      window.addEventListener('resize', updateEditorHeight)
+      return () => window.removeEventListener('resize', updateEditorHeight)
+    }
+  }, [isOpen])
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!formData.title.trim() || !formData.content.trim()) {
       alert('제목과 내용을 모두 입력해주세요.')
       return
     }
-    onSubmit(formData)
-    onClose()
+    await onSubmit(formData)
   }
 
   const handleAddTag = () => {
@@ -87,8 +102,8 @@ export default function MemoForm({
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-2 sm:p-4 z-50">
+      <div className="bg-white rounded-lg shadow-xl w-full max-w-5xl max-h-[98vh] sm:max-h-[95vh] overflow-y-auto">
         <div className="p-6">
           {/* 헤더 */}
           <div className="flex justify-between items-center mb-6">
@@ -170,26 +185,33 @@ export default function MemoForm({
 
             {/* 내용 */}
             <div>
-              <label
-                htmlFor="content"
-                className="block text-sm font-medium text-gray-700 mb-2"
-              >
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 내용 *
               </label>
-              <textarea
-                id="content"
-                value={formData.content}
-                onChange={e =>
-                  setFormData(prev => ({
-                    ...prev,
-                    content: e.target.value,
-                  }))
-                }
-                className="placeholder-gray-400 text-gray-400 w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors resize-none"
-                placeholder="메모 내용을 입력하세요"
-                rows={8}
-                required
-              />
+              <div className="border border-gray-300 rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500">
+                <MDEditor
+                  value={formData.content}
+                  onChange={value => 
+                    setFormData(prev => ({
+                      ...prev,
+                      content: value || '',
+                    }))
+                  }
+                  data-color-mode="light"
+                  preview="live"
+                  hideToolbar={false}
+                  visibleDragbar={false}
+                  height={editorHeight}
+                  textareaProps={{
+                    placeholder: '마크다운으로 메모를 작성하세요...\n\n예시:\n# 제목\n## 부제목\n- 목록 항목\n**굵은 글씨**\n*기울임 글씨*',
+                    style: {
+                      fontSize: '14px',
+                      lineHeight: '1.5',
+                      resize: 'none'
+                    }
+                  }}
+                />
+              </div>
             </div>
 
             {/* 태그 */}

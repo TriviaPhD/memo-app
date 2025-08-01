@@ -1,10 +1,8 @@
 'use client'
 
 import { useState, useEffect, useCallback, useMemo } from 'react'
-import { v4 as uuidv4 } from 'uuid'
 import { Memo, MemoFormData } from '@/types/memo'
-import { localStorageUtils } from '@/utils/localStorage'
-import { seedSampleData } from '@/utils/seedData'
+import { supabaseMCPUtils } from '@/utils/supabase-mcp'
 
 export const useMemos = () => {
   const [memos, setMemos] = useState<Memo[]>([])
@@ -12,58 +10,75 @@ export const useMemos = () => {
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('all')
 
-  // 메모 로드
+  // 메모 로드 (MCP 연동)
   useEffect(() => {
-    setLoading(true)
-    try {
-      // 샘플 데이터 시딩 (기존 데이터가 없을 때만)
-      seedSampleData()
-      const loadedMemos = localStorageUtils.getMemos()
-      setMemos(loadedMemos)
-    } catch (error) {
-      console.error('Failed to load memos:', error)
-    } finally {
-      setLoading(false)
-    }
-  }, [])
-
-  // 메모 생성
-  const createMemo = useCallback((formData: MemoFormData): Memo => {
-    const newMemo: Memo = {
-      id: uuidv4(),
-      ...formData,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    }
-
-    localStorageUtils.addMemo(newMemo)
-    setMemos(prev => [newMemo, ...prev])
-
-    return newMemo
-  }, [])
-
-  // 메모 업데이트
-  const updateMemo = useCallback(
-    (id: string, formData: MemoFormData): void => {
-      const existingMemo = memos.find(memo => memo.id === id)
-      if (!existingMemo) return
-
-      const updatedMemo: Memo = {
-        ...existingMemo,
-        ...formData,
-        updatedAt: new Date().toISOString(),
+    const loadMemos = async () => {
+      setLoading(true)
+      try {
+        // MCP를 통한 데이터베이스 초기화
+        await supabaseMCPUtils.initializeDatabase()
+        // 샘플 데이터 생성 (필요시)
+        await supabaseMCPUtils.seedSampleData()
+        // 메모 로드
+        const loadedMemos = await supabaseMCPUtils.getMemos()
+        setMemos(loadedMemos)
+        console.log('MCP를 통한 메모 로드 완료:', loadedMemos.length, '개')
+      } catch (error) {
+        console.error('Failed to load memos via MCP:', error)
+      } finally {
+        setLoading(false)
       }
+    }
 
-      localStorageUtils.updateMemo(updatedMemo)
-      setMemos(prev => prev.map(memo => (memo.id === id ? updatedMemo : memo)))
+    loadMemos()
+  }, [])
+
+  // 메모 생성 (MCP 연동)
+  const createMemo = useCallback(async (formData: MemoFormData): Promise<Memo | null> => {
+    try {
+      const newMemo = await supabaseMCPUtils.addMemo(formData)
+      if (newMemo) {
+        setMemos(prev => [newMemo, ...prev])
+        return newMemo
+      }
+      return null
+    } catch (error) {
+      console.error('Failed to create memo via MCP:', error)
+      return null
+    }
+  }, [])
+
+  // 메모 업데이트 (MCP 연동)
+  const updateMemo = useCallback(
+    async (id: string, formData: MemoFormData): Promise<boolean> => {
+      try {
+        const updatedMemo = await supabaseMCPUtils.updateMemo(id, formData)
+        if (updatedMemo) {
+          setMemos(prev => prev.map(memo => (memo.id === id ? updatedMemo : memo)))
+          return true
+        }
+        return false
+      } catch (error) {
+        console.error('Failed to update memo via MCP:', error)
+        return false
+      }
     },
-    [memos]
+    []
   )
 
-  // 메모 삭제
-  const deleteMemo = useCallback((id: string): void => {
-    localStorageUtils.deleteMemo(id)
-    setMemos(prev => prev.filter(memo => memo.id !== id))
+  // 메모 삭제 (MCP 연동)
+  const deleteMemo = useCallback(async (id: string): Promise<boolean> => {
+    try {
+      const success = await supabaseMCPUtils.deleteMemo(id)
+      if (success) {
+        setMemos(prev => prev.filter(memo => memo.id !== id))
+        return true
+      }
+      return false
+    } catch (error) {
+      console.error('Failed to delete memo via MCP:', error)
+      return false
+    }
   }, [])
 
   // 메모 검색
@@ -107,12 +122,21 @@ export const useMemos = () => {
     return filtered
   }, [memos, selectedCategory, searchQuery])
 
-  // 모든 메모 삭제
-  const clearAllMemos = useCallback((): void => {
-    localStorageUtils.clearMemos()
-    setMemos([])
-    setSearchQuery('')
-    setSelectedCategory('all')
+  // 모든 메모 삭제 (MCP 연동)
+  const clearAllMemos = useCallback(async (): Promise<boolean> => {
+    try {
+      const success = await supabaseMCPUtils.clearAllMemos()
+      if (success) {
+        setMemos([])
+        setSearchQuery('')
+        setSelectedCategory('all')
+        return true
+      }
+      return false
+    } catch (error) {
+      console.error('Failed to clear all memos via MCP:', error)
+      return false
+    }
   }, [])
 
   // 통계 정보

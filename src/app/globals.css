@@ -1,4 +1,6 @@
 @import 'tailwindcss';
+@import '@uiw/react-md-editor/markdown-editor.css';
+@import '@uiw/react-markdown-preview/markdown.css';
 
 :root {
   --background: #ffffff;
@@ -38,4 +40,146 @@ body {
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+
+/* MDEditor 커스터마이징 */
+.w-md-editor {
+  border: none !important;
+  background-color: white !important;
+}
+
+.w-md-editor-text-input, 
+.w-md-editor-text-area,
+.w-md-editor-text {
+  font-size: 14px !important;
+  line-height: 1.5 !important;
+}
+
+.w-md-editor.w-md-editor-focus {
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.w-md-editor-toolbar {
+  border-bottom: 1px solid #e5e7eb !important;
+  background-color: #f9fafb !important;
+}
+
+.w-md-editor-toolbar li > button {
+  color: #6b7280 !important;
+}
+
+.w-md-editor-toolbar li > button:hover {
+  color: #374151 !important;
+  background-color: #e5e7eb !important;
+}
+
+/* 마크다운 리스트 스타일 복원 */
+.w-md-editor-preview ul,
+.prose ul,
+.wmde-markdown ul {
+  list-style-type: disc !important;
+  margin-left: 1.5rem !important;
+  margin-top: 0.5rem !important;
+  margin-bottom: 0.5rem !important;
+}
+
+.w-md-editor-preview ol,
+.prose ol,
+.wmde-markdown ol {
+  list-style-type: decimal !important;
+  margin-left: 1.5rem !important;
+  margin-top: 0.5rem !important;
+  margin-bottom: 0.5rem !important;
+}
+
+.w-md-editor-preview li,
+.prose li,
+.wmde-markdown li {
+  margin-top: 0.25rem !important;
+  margin-bottom: 0.25rem !important;
+  display: list-item !important;
+}
+
+.w-md-editor-preview ul ul,
+.w-md-editor-preview ol ol,
+.prose ul ul,
+.prose ol ol,
+.wmde-markdown ul ul,
+.wmde-markdown ol ol {
+  margin-top: 0.25rem !important;
+  margin-bottom: 0.25rem !important;
+}
+
+/* 중첩된 리스트 스타일 */
+.w-md-editor-preview ul ul,
+.prose ul ul,
+.wmde-markdown ul ul {
+  list-style-type: circle !important;
+}
+
+.w-md-editor-preview ul ul ul,
+.prose ul ul ul,
+.wmde-markdown ul ul ul {
+  list-style-type: square !important;
+}
+
+/* 마크다운 다른 요소들 스타일 보강 */
+.w-md-editor-preview h1,
+.w-md-editor-preview h2,
+.w-md-editor-preview h3,
+.w-md-editor-preview h4,
+.w-md-editor-preview h5,
+.w-md-editor-preview h6,
+.prose h1,
+.prose h2,
+.prose h3,
+.prose h4,
+.prose h5,
+.prose h6,
+.wmde-markdown h1,
+.wmde-markdown h2,
+.wmde-markdown h3,
+.wmde-markdown h4,
+.wmde-markdown h5,
+.wmde-markdown h6 {
+  margin-top: 1rem !important;
+  margin-bottom: 0.5rem !important;
+  font-weight: 600 !important;
+}
+
+.w-md-editor-preview p,
+.prose p,
+.wmde-markdown p {
+  margin-top: 0.5rem !important;
+  margin-bottom: 0.5rem !important;
+}
+
+.w-md-editor-preview blockquote,
+.prose blockquote,
+.wmde-markdown blockquote {
+  border-left: 4px solid #e5e7eb !important;
+  padding-left: 1rem !important;
+  margin: 1rem 0 !important;
+  font-style: italic !important;
+  color: #6b7280 !important;
+}
+
+.w-md-editor-preview code,
+.prose code,
+.wmde-markdown code {
+  background-color: #f3f4f6 !important;
+  padding: 0.125rem 0.25rem !important;
+  border-radius: 0.25rem !important;
+  font-size: 0.875em !important;
+}
+
+.w-md-editor-preview pre,
+.prose pre,
+.wmde-markdown pre {
+  background-color: #f3f4f6 !important;
+  padding: 1rem !important;
+  border-radius: 0.375rem !important;
+  overflow-x: auto !important;
+  margin: 1rem 0 !important;
 }

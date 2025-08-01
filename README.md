@@ -2,7 +2,9 @@
 
 **핸즈온 실습용 Next.js 메모 애플리케이션**
 
-LocalStorage 기반의 완전한 CRUD 기능을 갖춘 메모 앱으로, MCP 연동 및 GitHub PR 생성 실습의 기반이 되는 프로젝트입니다.
+Supabase 데이터베이스 기반의 완전한 CRUD 기능을 갖춘 메모 앱으로, MCP 연동 및 GitHub PR 생성 실습의 기반이 되는 프로젝트입니다.
+
+> **최신 업데이트**: 이 프로젝트는 LocalStorage에서 Supabase 데이터베이스로 마이그레이션되었습니다!
 
 ## 🚀 주요 기능
 
@@ -11,7 +13,7 @@ LocalStorage 기반의 완전한 CRUD 기능을 갖춘 메모 앱으로, MCP 연
 - 🏷️ 태그 시스템으로 메모 태깅
 - 🔍 제목, 내용, 태그 기반 실시간 검색
 - 📱 반응형 디자인 (모바일, 태블릿, 데스크톱)
-- 💾 LocalStorage 기반 데이터 저장 (오프라인 지원)
+- ☁️ Supabase 클라우드 데이터베이스 연동
 - 🎨 모던한 UI/UX with Tailwind CSS
 
 ## 🛠 기술 스택
@@ -19,25 +21,41 @@ LocalStorage 기반의 완전한 CRUD 기능을 갖춘 메모 앱으로, MCP 연
 - **Framework**: Next.js 15.4.4 (App Router)
 - **Language**: TypeScript
 - **Styling**: Tailwind CSS v4
-- **Storage**: LocalStorage
+- **Database**: Supabase (PostgreSQL)
+- **Client Library**: @supabase/supabase-js
 - **State Management**: React Hooks (useState, useEffect, useMemo)
 - **Package Manager**: npm
 
 ## 📦 설치 및 실행
 
-### 1. 의존성 설치
+### 1. Supabase 설정
+
+1. [Supabase](https://supabase.com)에서 새 프로젝트 생성
+2. Project Settings → API에서 URL과 anon key 확인
+3. SQL Editor에서 [데이터베이스 스키마](docs/supabase-migration.md#데이터베이스-스키마) 실행
+
+### 2. 환경 변수 설정
+
+프로젝트 루트에 `.env.local` 파일 생성:
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+```
+
+### 3. 의존성 설치
 
 ```bash
 npm install
 ```
 
-### 2. 개발 서버 실행
+### 4. 개발 서버 실행
 
 ```bash
 npm run dev
 ```
 
-### 3. 브라우저 접속
+### 5. 브라우저 접속
 
 ```
 http://localhost:3000
