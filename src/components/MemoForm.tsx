@@ -200,7 +200,7 @@ export default function MemoForm({
                   data-color-mode="light"
                   preview="live"
                   hideToolbar={false}
-                  visibleDragBar={false}
+                  visibleDragbar={false}
                   height={editorHeight}
                   textareaProps={{
                     placeholder: '마크다운으로 메모를 작성하세요...\n\n예시:\n# 제목\n## 부제목\n- 목록 항목\n**굵은 글씨**\n*기울임 글씨*',

@@ -9,7 +9,7 @@ export const supabaseMCPUtils = {
       console.log('MCP를 통한 Supabase 데이터베이스 초기화...')
       
       // MCP를 통해 테이블 존재 확인 및 생성
-      await this.createTableIfNotExists()
+      await supabaseMCPUtils.createTableIfNotExists()
       return true
     } catch (error) {
       console.error('데이터베이스 초기화 실패:', error)
@@ -61,7 +61,7 @@ export const supabaseMCPUtils = {
       END $$;
     `
     
-    console.log('테이블 생성 SQL 실행 중...')
+    console.log('테이블 생성 SQL 실행 준비... 길이:', createTableSQL.length)
     // 실제 환경에서는 MCP 함수로 대체됩니다
   },
 
